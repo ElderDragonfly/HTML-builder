@@ -34,9 +34,7 @@ async function writeCSSData(array, finalFilePath) { // и проверяем и 
         for (const file of array) {
             const fileCSSPath = path.join(stylesPath, file); // путь к файлу
             const data = await fs.readFile(fileCSSPath, 'utf8'); // данные в файле
-            if (/\{[\s\S]*?\}/.test(data)) {
-                await fs.appendFile(finalFilePath, data, 'utf8');
-            }
+            await fs.appendFile(finalFilePath, data, 'utf8');
         }
     } catch (error) {
         console.log('error in writeCSSData');
