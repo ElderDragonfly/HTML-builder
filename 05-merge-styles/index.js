@@ -18,48 +18,27 @@ readDirectory(stylesPath);
 async function readDirectory(directoryPath) {
     try {
         const filesArray = await fs.readdir(directoryPath);
-        await checkFakeCSS(filesArray, bundlePath);
+        const cssFiles = filesArray.filter(async (file) => { // фильтрую только файлы и расширение .css
+            const filePath = path.join(stylesPath, file);
+            const stats = await fs.lstat(filePath);
+            return stats.isFile() && path.extname(file) === '.css';
+        });
+        await writeCSSData(cssFiles, bundlePath);
     } catch (error) {
         console.log('error in readDirectory');
     }
 }
 
-async function checkFakeCSS(array, finalFilePath) {
+async function writeCSSData(array, finalFilePath) { // и проверяем и записываем
     try {
         for (const file of array) {
-            const fileCSSPath = path.join(stylesPath, file);
-            const data = await fs.readFile(fileCSSPath, 'utf8');
+            const fileCSSPath = path.join(stylesPath, file); // путь к файлу
+            const data = await fs.readFile(fileCSSPath, 'utf8'); // данные в файле
             if (/\{[\s\S]*?\}/.test(data)) {
                 await fs.appendFile(finalFilePath, data, 'utf8');
             }
         }
     } catch (error) {
-        console.log('error in checkFakeCSS');
+        console.log('error in writeCSSData');
     }
 }
-
-
-
-
-
-
-
-
-// async function writeFile(data, path) {
-//     try {
-//         await fs.writeFile(path, data)
-//     } catch (error) {
-//         console.log('error');
-//     }
-// }
-
-
-
-// (async () => {
-//     try {
-//         const test = await readDirectory(stylesPath); // Ожидаем массив файлов
-//         await checkFakeCSS(test); // Передаем массив в функцию
-//     } catch (error) {
-//         console.error('Unexpected error:', error);
-//     }
-// })();
