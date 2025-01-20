@@ -13,30 +13,23 @@ async function createFile(filePath, data) {
     }
 }
 createFile(bundlePath, '');
-readDirectory(stylesPath);
+readStylesDirectory(stylesPath, bundlePath);
 
-async function readDirectory(directoryPath) {
+async function readStylesDirectory(sourceDir, targetFilePath) { // читает и записывает стили
     try {
-        const filesArray = await fs.readdir(directoryPath);
-        const cssFiles = filesArray.filter(async (file) => { // фильтрую только файлы и расширение .css
-            const filePath = path.join(stylesPath, file);
-            const stats = await fs.lstat(filePath);
-            return stats.isFile() && path.extname(file) === '.css';
-        });
-        await writeCSSData(cssFiles, bundlePath);
-    } catch (error) {
-        console.log('error in readDirectory');
-    }
-}
+        const entries = await fs.readdir(sourceDir, { withFileTypes: true });
 
-async function writeCSSData(array, finalFilePath) { // и проверяем и записываем
-    try {
-        for (const file of array) {
-            const fileCSSPath = path.join(stylesPath, file); // путь к файлу
-            const data = await fs.readFile(fileCSSPath, 'utf8'); // данные в файле
-            await fs.appendFile(finalFilePath, data, 'utf8');
+        for(const entry of entries) {
+            const sourcePath = path.join(sourceDir, entry.name);
+
+            if (entry.isDirectory()) {
+                await readStylesDirectory(sourcePath, targetFilePath);
+            } else if (entry.isFile() && path.extname(entry.name) === '.css') {
+                const data = await fs.readFile(sourcePath, 'utf8');
+                await fs.appendFile(targetFilePath, data);
+            }
         }
     } catch (error) {
-        console.log('error in writeCSSData');
+        console.log(error);
     }
 }
