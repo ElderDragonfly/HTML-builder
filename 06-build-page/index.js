@@ -15,7 +15,7 @@ const componentsPath = path.join(__dirname, 'components');
 async function checkMainDirectory() {
     try {
         await fs.access(projectDistPath);
-        await fs.rmdir(projectDistPath, { recursive: true });
+        await fs.rmdir(projectDistPath, { recursive: true, force: true });
         await startApp();
     } catch (error) {
         startApp();
