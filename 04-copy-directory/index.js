@@ -9,13 +9,22 @@ const copyDirectoryPath = path.join(__dirname, 'files-copy');
 async function checkDirectoryExist() {
   try {
     await fs.access(copyDirectoryPath); // проверка существования директории
-    await fs.rmdir(copyDirectoryPath, { recursive: true, force: true });
-    await startCopy();
+    await removeDirectory(copyDirectoryPath);
   } catch (error) {
-    await startCopy();
+    console.log(error);
   }
+  await startCopy();
 }
 checkDirectoryExist();
+
+// удаляем директорию
+async function removeDirectory(copyDirectoryPath) {
+  try {
+    await fs.rm(copyDirectoryPath, { recursive: true, force: true });
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 // создаём и копируем
 async function startCopy() {
@@ -46,8 +55,8 @@ async function copyDirectory(sourceDir, targetDir) {
 
       if (entry.isDirectory()) {
         const newDirPath = path.join(targetDir, entry.name);
-        createDirectory(newDirPath);
-        await copyAssetsDirectory(sourcePath, newDirPath);
+        await createDirectory(newDirPath);
+        await copyDirectory(sourcePath, newDirPath);
       } else if (entry.isFile()) {
         const targetPath = path.join(targetDir, entry.name);
         await fs.copyFile(sourcePath, targetPath);
