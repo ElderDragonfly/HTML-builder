@@ -86,7 +86,7 @@ async function copyAssetsDirectory(sourceDir, targetDir) {
 
       if (entry.isDirectory()) {
         const newDirPath = path.join(targetDir, entry.name);
-        createDirectory(newDirPath);
+        await createDirectory(newDirPath);
         await copyAssetsDirectory(sourcePath, newDirPath);
       } else if (entry.isFile()) {
         const targetPath = path.join(targetDir, entry.name);
