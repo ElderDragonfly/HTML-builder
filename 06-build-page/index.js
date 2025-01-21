@@ -107,7 +107,7 @@ async function replaceTemplateTagWithComponent(HTMLData, tagName) {
     const componentData = await fs.readFile(componentPath, 'utf8');
     return HTMLData.replace(regex, componentData);
   } catch (error) {
-    console.log(`Error reading component ${tagName}: ${error.message}`);
+    console.log(error);
     return HTMLData; // Вернем HTML без изменений, если компонента не существует
   }
 }
