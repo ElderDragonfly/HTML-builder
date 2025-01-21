@@ -11,6 +11,18 @@ const assetsPath = path.join(__dirname, 'assets');
 const indexPath = path.join(__dirname, 'template.html');
 const componentsPath = path.join(__dirname, 'components');
 
+// начало работы: проверка существования дирректории и удаление, если она существует. Запуск основной логики
+async function checkMainDirectory() {
+    try {
+        await fs.access(projectDistPath);
+        await fs.rmdir(projectDistPath, { recursive: true });
+        await startApp();
+    } catch (error) {
+        startApp();
+    }
+}
+checkMainDirectory();
+
 async function startApp() {
     try {
         await createDirectory(projectDistPath);
@@ -22,7 +34,6 @@ async function startApp() {
         console.log(error);
     }
 }
-startApp();
 
 // общий блок работы с дирректориями
 async function createDirectory(directoryPath) {
