@@ -18,7 +18,7 @@ async function checkMainDirectory() {
     await fs.rm(projectDistPath, { recursive: true, force: true });
     await startApp();
   } catch (error) {
-    startApp();
+    await startApp();
   }
 }
 checkMainDirectory();
@@ -29,7 +29,7 @@ async function startApp() {
     await createFile(projectStylesPath, '');
     await createDirectory(projectAssetsPath);
     await copyAssetsDirectory(assetsPath, projectAssetsPath);
-    generareIndexHTML();
+    await generareIndexHTML();
   } catch (error) {
     console.log(error);
   }
