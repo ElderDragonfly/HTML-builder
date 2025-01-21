@@ -5,13 +5,13 @@ const readline = require('readline');
 
 const filePath = path.join(__dirname, 'text.txt');
 
-const stream = fs.createWriteStream(filePath, { flags: 'a'}, () => {});
+const stream = fs.createWriteStream(filePath, { flags: 'a' }, () => {});
 
 console.log('Hello, stranger\nInput something');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 rl.on('line', (input) => {
