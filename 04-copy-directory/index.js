@@ -10,9 +10,7 @@ async function checkDirectoryExist() {
   try {
     await fs.access(copyDirectoryPath); // проверка существования директории
     await removeDirectory(copyDirectoryPath);
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
   await startCopy();
 }
 checkDirectoryExist();
