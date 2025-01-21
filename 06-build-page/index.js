@@ -14,7 +14,7 @@ const componentsPath = path.join(__dirname, 'components');
 // начало работы: проверка существования дирректории и удаление, если она существует. Запуск основной логики
 async function checkMainDirectory() {
     try {
-        await fs.access(projectDistPath);
+        await fs.access(projectDistPath); // проверка существования директории
         await fs.rmdir(projectDistPath, { recursive: true, force: true });
         await startApp();
     } catch (error) {

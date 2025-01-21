@@ -5,10 +5,29 @@ const path = require('path');
 const originalDirectoryPath = path.join(__dirname, 'files');
 const copyDirectoryPath = path.join(__dirname, 'files-copy');
 
-async function removeDirectory(directoryPath) {
-    await fs.rm(directoryPath, { recursive: true, force: true });
+// новый вариант: проверка существования папки
+async function checkDirectoryExist() {
+    try {
+        await fs.access(copyDirectoryPath); // проверка существования директории
+        await fs.rmdir(copyDirectoryPath, { recursive: true, force: true });
+        await startCopy();
+    } catch (error) {
+        await startCopy();
+    }
+}
+checkDirectoryExist();
+
+// создаём и копируем
+async function startCopy() {
+    try {
+        await createDirectory(copyDirectoryPath);
+        await copyDirectory(originalDirectoryPath, copyDirectoryPath);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
+// создание директории
 async function createDirectory(directoryPath) {
     try {
         await fs.mkdir(directoryPath, { recursive: true });
@@ -16,40 +35,27 @@ async function createDirectory(directoryPath) {
         console.log(error);
     }
 }
-
-async function readDirectory() {
+// блок копирования папки
+async function copyDirectory(sourceDir, targetDir) { // читает и записывает асеты
     try {
-        const originalDirectory = await fs.readdir(originalDirectoryPath);
-        return originalDirectory;
-    } catch (error) {
-        console.log('error');
-    }
-}
+        const entries = await fs.readdir(sourceDir, { withFileTypes: true });
 
-async function checkDirectory() {
-    try {
-        const stats = await fs.stat(copyDirectoryPath); // пытается получить stat дирректории, и если она не существует, переходит в блок ошибки
-        await removeDirectory(copyDirectoryPath);
-        await createDirectory(copyDirectoryPath);
-        await copyDirectory(copyDirectoryPath);
-    } catch (error) {
-        await createDirectory(copyDirectoryPath);
-        await copyDirectory(copyDirectoryPath);
-    }
-}
+        for(const entry of entries) {
+            const sourcePath = path.join(sourceDir, entry.name);
 
-async function copyDirectory(directoryPath) {
-    try {
-        const originalDirectoryArr = await readDirectory();
-        for (const file of originalDirectoryArr) {
-            const originalFilePath = path.join(originalDirectoryPath, file);
-            const copyFilePath = path.join(directoryPath, file);
-            await fs.copyFile(originalFilePath, copyFilePath);
+            if (entry.isDirectory()) {
+                const newDirPath = path.join(targetDir, entry.name);
+                createDirectory(newDirPath);
+                await copyAssetsDirectory(sourcePath, newDirPath);
+            } else if (entry.isFile()) {
+                const targetPath = path.join(targetDir, entry.name);
+                await fs.copyFile(sourcePath, targetPath);
+
+            }
         }
     } catch (error) {
-        console.log('error');
+        console.log(error);
     }
-}
 
-checkDirectory();
+}
 
